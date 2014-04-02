@@ -1,0 +1,23 @@
+.formtable {
+    width: auto;
+}
+
+.selected {
+    background-color: #D0F2F5;
+}
+
+#id_geography_id {
+    width: 100%;
+}
+
+.popin{
+  background:#fff;
+  padding:15px;
+  box-shadow: 0 0 20px #999;
+  border-radius:2px;
+}
+
+#map {
+  height:300px;
+  background:#6699cc;
+}
