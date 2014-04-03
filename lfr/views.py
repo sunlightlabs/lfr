@@ -13,6 +13,7 @@ from django.views.generic.edit import FormView
 
 from .forms import GeoLookupForm
 
+
 class Home(FormView):
     template_name = 'geo_lookup.html'
     form_class = GeoLookupForm
@@ -25,6 +26,13 @@ class Home(FormView):
             lon=request.POST['lng'],
             apikey=settings.SUNLIGHT_API_KEY)
         resp = requests.get(url, params=params)
+
+        url = 'http://api.opencivicdata.org/organizations'
+        params = dict(
+            division_id={'$in': },
+            apikey=settings.SUNLIGHT_API_KEY)
+        resp = requests.get(url, params=params)
+
         import pdb; pdb.set_trace()
 
 
