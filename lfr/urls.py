@@ -1,11 +1,11 @@
 from django.conf.urls import patterns, include, url
 
-from django.contrib import admin
-admin.autodiscover()
+from app.views import *
+
 
 urlpatterns = patterns('',
-    # Examples:
-    url(r'^$', 'lfr.views.home', name='home'),
-    url(r'^results/$', 'lfr.views.results', name='results'),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^', include('app.urls')),
+    url(r'^login/$', Login.as_view(), name='login'),
+    url(r'^enter_password/$', EnterPassword.as_view(), name='enter_password'),
+    url(r'^reset_password/$', ResetPassword.as_view(), name='reset_password'),
 )
