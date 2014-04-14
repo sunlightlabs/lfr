@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+
+{% block content %}
+<div class="module">
+  <form id="message" method="post">
+    {% csrf_token %}
+    <h1>Compose your message Bro</h1>
+      {{ form.as_table }}
+    <div class="clear"></div>
+    <button type="submit" class="btn btn-default btn-lg active">Button</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+<script>
+$(document).ready(function() {
+    // Because there's no way to specify custom label css in Django.
+    $('label[for="id_remember_me"]').css('class', 'checkbox');
+});
+</script>
+{% endblock extra_head %}
+
+{% block content %}
+<div class="module">
+  <div>
+    <form method="POST" class="login-form-signin">
+      <h2 class="login-form-signin-heading">{{ prompt }}</h2>
+      {% csrf_token %}
+      {{ form }}
+      <button class="btn btn-large" type="submit">Sign in</button>
+      {% if show_reset %}
+      <div>
+        <a href="{% url 'reset_password' %}">Reset password</a>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

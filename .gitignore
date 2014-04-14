@@ -44,4 +44,4 @@ logs
 settings_local.py
 .python_history
 
-db.sqlite
+db.sqlite3
