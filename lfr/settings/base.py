@@ -43,6 +43,17 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    'django.core.context_processors.request',
+)
+
 ROOT_URLCONF = 'lfr.urls'
 
 WSGI_APPLICATION = 'lfr.wsgi.application'
@@ -73,8 +84,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 # Project urls.
 LOGIN_URL = '/login/'
-VERIFY_EMAIL_URL = '/verify_email/'
+LOGIN_REDIRECT_URL = '/'
+VERIFY_EMAIL_URL = '/verify_email_pending/'
 SET_PASSWORD_URL = '/set_password/'
 
 # Custom auth mode.
 AUTH_USER_MODEL = 'app.LfrUser'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+LFR_DOMAIN = 'localhost:8000'
+LFR_EMAIL_SENDER = 'thom@example.com'

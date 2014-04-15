@@ -9,18 +9,11 @@
   <meta name="author" content="Sunlight Foundation">
 
   <meta property="og:title" content="Let Freedom Ring" />
-  <meta property="og:url" content="http://opencivicdata.org" />
   <meta property="og:type" content="website" />
   <meta property="og:description" content="Contact Your Legislator" />
-  <meta property="og:image" content="http://opencivicdata.org/img/OpenCivicDatafb.png" />
-  <meta property="fb:admins" content="7406790" />
 
-  <title>Open Civic Data</title>
+  <title>Let Freedom Ring</title>
 
-  <!-- Open graph stuff. -->
-  <script type="text/javascript" src="//use.typekit.com/tab6neo.js"></script>
-  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
   <title>{% block title %}{% endblock %}</title>
 
@@ -34,6 +27,9 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/sfapp.min.css' %}">
+    <script type="text/javascript" src="//use.typekit.com/tab6neo.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   {% endif %}
 
   <link rel="stylesheet" href="{% static 'css/site.css' %}">
@@ -49,13 +45,9 @@
 </head>
   <body class="home">
     <div class="sf-header">
-
-
       <div class="container">
         <a class="sf-logo" href="http://www.sunlightfoundation.com">Sunlight Foundation</a>
       </div>
-
-    </div>
 
       <div class="container">
         <div id="login" class="tip pull-right">
@@ -65,14 +57,13 @@
             <a href="{{login_url}}?next={{request.get_full_path}}">Login or Sign up</a>
           {% endif %}
         </div>
-
-        <h3 class="muted"><a href="{% url 'geo_lookup' %}">Let Freedom Ring</a></h3>
+    </div>
 
         <!--messages -->
         {% for message in messages %}
         <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
           <ul class="inline">
-            <li>{{ message|safe }}</li>
+            <li class="list-unstyled">{{ message|safe }}</li>
           </ul>
         </div>
         {% endfor %}

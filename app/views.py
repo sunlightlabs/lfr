@@ -4,19 +4,29 @@ import operator
 import requests
 
 from django.conf import settings
-from django.core import urlresolvers
-from django.views.generic import edit
-# from django.http import HttpResponse, Http404
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import user_passes_test
-# from django.contrib import messages
+from django.core import urlresolvers, mail
 
-from django.contrib.auth import get_user_model, login
-from django.contrib.auth.decorators import login_required, permission_required
-# from django.views.decorators.http import require_POST
+from django.views.generic import edit
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.cache import never_cache
+
+from django.template import loader
+from django.template.response import TemplateResponse
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_text
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
+from django.contrib.auth.models import Group, Permission
+from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.decorators import (
+    user_passes_test, login_required, permission_required)
+from django.contrib.contenttypes.models import ContentType
 
 from . import forms
-from .models import Message
+from .models import Message, LfrUser
 
 
 class GeoLookup(edit.FormView):
@@ -41,10 +51,11 @@ class ComposeMessage(edit.CreateView):
     @property
     def success_url(self):
         '''When users successfully submit the form, they get
-        redirected to `authorize_messages` which is where all the
+        redirected to `confirm_message_sent` which is where all the
         auth(entication|orization) checking happens.
         '''
-        return urlresolvers.reverse('authorize_message')
+        return urlresolvers.reverse(
+            'confirm_message_sent', args=(self.object.id,))
 
     def get_initial(self):
         '''Prepopulate the form the requested person_id and the user's
@@ -52,77 +63,133 @@ class ComposeMessage(edit.CreateView):
         '''
         initial_data = dict(self.request.GET.items())
         if self.request.user.is_authenticated():
-            initial_data['email'] = user.email
+            initial_data['email'] = self.request.user.email
         return initial_data
 
     def form_valid(self, form):
         '''If the user is not logged in, create a passwordless
         account for them and consider them logged in.
         '''
+
+        # Create new user if necessary.
         if not self.request.user.is_authenticated():
             email = form.data['email']
             User = get_user_model()
             user, created = User.objects.get_or_create(email=email)
             if created:
                 # Set a dummy password and log the new user in.
+                user.set_password('doggy')
+                user.save()
+                user = authenticate(email=user.email, password='doggy')
                 user.set_unusable_password()
                 login(self.request, user)
             else:
                 # Here the user exists but isn't logged in.
                 # They'll get prompted for passwd at authorize_message.
-                pass
-        return super().form_valid(form)
+                # Make a email address available to the login view.
+                self.request.session['email'] = email
 
+        # Trigger the form save.
+        redirect_resp = super().form_valid(form)
+
+        # Store the message for later confirmation view.
+        self.request.session['message_id'] = self.object.id
+
+        return redirect_resp
 
 def prompt_for_password(user):
-    return user.has_unusable_password()
-
-
-class EnterPassword(edit.FormView):
-    template_name = 'login.html'
-    template_name = 'enter_password.html'
-    form_class = forms.PasswordForm
-
-    def get_context_data(self, **kwargs):
-        kwargs['prompt'] = 'Please enter your password'
-        return kwargs
-
-    def form_valid(self, form):
-        import pdb; pdb.set_trace()
-
-
-class Login(edit.FormView):
-    template_name = 'login.html'
-    form_class = forms.LoginForm
-
-    def get_context_data(self, **kwargs):
-        kwargs.update(
-            prompt='Please sign in',
-            show_reset=True)
-        return kwargs
-
-    def form_valid(self, form):
-        import pdb; pdb.set_trace()
-
-
-class ResetPassword(edit.FormView):
-    template_name = 'reset_password.html'
-    form_class = forms.ResetPasswordForm
-
-    def form_valid(self, form):
-        '''Generate password reset token and send password reset email.
-        '''
-        import pdb; pdb.set_trace()
+    if hasattr(user, 'has_unusable_password'):
+        return user.has_unusable_password()
+    return True
 
 
 @login_required
 @user_passes_test(prompt_for_password, login_url=settings.SET_PASSWORD_URL)
 @permission_required('app.add_message', login_url=settings.VERIFY_EMAIL_URL)
-def authorize_message(request):
+def confirm_message_sent(request, message_id):
     '''This ensures the user is authenticated, has been prompted for a
     password, and has a verified email address. After that, it sends
     the message request off to earwig.
     '''
-    import pdb; pdb.set_trace()
+    message = Message.objects.get(id=message_id)
+    ctx = dict(message=message)
+    return render(request, 'app/confirm_message_sent.html', ctx)
 
 
+def email_verification_prompt(request):
+    '''Send the email to start email verification.
+
+    See django.contrib.auth.forms.PasswordResetForm
+    '''
+    ctx = {
+        'email': request.user.email,
+        'uid': urlsafe_base64_encode(force_bytes(request.user.pk)),
+        'user': request.user,
+        'domain': settings.LFR_DOMAIN,
+        'token': default_token_generator.make_token(request.user),
+        'protocol': 'https' if request.is_secure() else 'http',
+    }
+    email_template = 'app/email/verify_email/body'
+    subject_template = 'app/email/verify_email/subject.txt'
+    subject = loader.render_to_string(subject_template, ctx)
+    subject = ''.join(subject.splitlines())
+    body_txt = loader.render_to_string(email_template + '.txt', ctx)
+    body_html = loader.render_to_string(email_template + '.html', ctx)
+    from_email = settings.LFR_EMAIL_SENDER
+    to = request.user.email
+
+    msg = mail.EmailMultiAlternatives(subject, body_txt, from_email, [to])
+    msg.attach_alternative(body_html, "text/html")
+    msg.send()
+    return render(request, 'app/verify_email_prompt.html', {})
+
+
+@sensitive_post_parameters()
+@never_cache
+def email_verification_confirmation(request, uidb64=None, token=None,
+       token_generator=default_token_generator,
+       post_reset_redirect=None,
+       current_app=None, extra_context=None):
+    '''User visited the email verification link.
+
+    See django.contrib.auth.view.password_reset_confirm
+    '''
+    UserModel = get_user_model()
+    assert uidb64 is not None and token is not None  # checked by URLconf
+    try:
+        uid = urlsafe_base64_decode(uidb64)
+        user = UserModel._default_manager.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+        user = None
+
+    if user is not None and token_generator.check_token(user, token):
+
+        # Mark the user as verified.
+        user.is_verified = True
+        user.save()
+
+        # Log the user in.
+        if not user.is_authenticated:
+            login(request, user)
+
+        # Grant message-save permission.
+        content_type = ContentType.objects.get_for_model(Message)
+        add_message = Permission.objects.get(codename='add_message')
+        user.user_permissions.add(add_message.id)
+
+        # XXX: Also send activation request to Earwig.
+        pass
+
+        return redirect('email_verification_complete')
+    else:
+        template_name='app/verify_email_invalid.html',
+        return render(request, template_name, {})
+
+
+def email_verification_complete(request):
+    messages.success(request, 'Your account was successfully activated.')
+    if request.user.is_authenticated:
+        message_id = request.session.pop('message_id')
+        return redirect(
+            urlresolvers.reverse('confirm_message_sent', args=(message_id,)))
+    return render(request, 'app/verify_email_complete.html', {})

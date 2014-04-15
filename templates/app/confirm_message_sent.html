@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<script>
+$(document).ready(function(){
+  $("label").hide();
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="module">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+      <h3>Your message was sent</h3>
+      <hr/>
+        <div class="row">
+          <div class="col-sm-1">From</div>
+          <div class="col-sm-8">{{message.user.email}}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-1">To</div>
+          <div class="col-sm-8">{{message.person_name}}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-1">Subject</div>
+          <div class="col-sm-8">{{message.subject}}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-1">Message</div>
+          <div class="col-sm-8">{{message.message}}</div>
+        </div>
+        {{message.message}}
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

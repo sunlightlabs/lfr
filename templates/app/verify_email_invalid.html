@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="module">
+  <h1>Failure!</h1>
+  <p>You clicked an invalid link. <a href="{% url 'geo_lookup' %}">Try again</a>.</p>
+</div>
+{% endblock %}

@@ -12,47 +12,25 @@ class GeoLookupForm(forms.Form):
 class MessageForm(ModelForm):
     class Meta:
         model = Message
-        fields = ['subject', 'person_id', 'message', 'email']
+        fields = [
+            'subject', 'person_id', 'person_name',
+            'message', 'email']
         widgets = {
-            'person_id': widgets.HiddenInput(),
-            'message': widgets.Textarea(),
+            'person_id': widgets.HiddenInput(attrs={}),
+            'person_name': widgets.HiddenInput(attrs={}),
+            'message': widgets.Textarea(attrs={
+                'placeholder': 'Type your message here.',
+                'class': "form-control",
+                }),
+            'subject': widgets.TextInput(attrs={
+                'placeholder': 'Subject',
+                'autofocus': True,
+                'class': "form-control"
+                }),
+            'email': widgets.TextInput(attrs={
+                'placeholder': 'Your email address',
+                'class': "form-control"
+                })
         }
 
 
-class PasswordForm(forms.Form):
-    password = forms.CharField()
-    remember_me = forms.BooleanField()
-    class Meta:
-       widgets = {
-            'password': forms.PasswordInput(attrs={
-                'class': 'input-block-level',
-                'placeholder': 'Password',
-                }),
-        }
-
-
-class LoginForm(forms.Form):
-    email = forms.EmailField()
-    password = forms.CharField()
-    remember_me = forms.BooleanField()
-    class Meta:
-       widgets = {
-            'password': forms.PasswordInput(attrs={
-                'class': 'input-block-level',
-                'placeholder': 'Password',
-                }),
-            'email': forms.EmailInput(attrs={
-                'class': 'input-block-level',
-                'placeholder': 'Email address',
-                }),
-        }
-
-
-class ResetPasswordForm(forms.Form):
-    email = forms.EmailField()
-    class Meta:
-       widgets = {
-            'email': forms.EmailInput(attrs={
-                'class': 'input-block-level',
-                }),
-        }

@@ -1,8 +1,6 @@
 $(document).ready(function() {
   var map;
 
-  debugger
-
   map = new GMaps({
     div: '#map',
     lat: -12.043333,

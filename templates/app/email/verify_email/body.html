@@ -1,0 +1,4 @@
+Hello! You're almost done activating your account on {{domain}}. To activate your account, please follow the link below. If you didn't create an account at {{domain}}, definitely ignore this email.
+
+<a href="{{ protocol}}://{{ domain }}{% url 'email_verification_confirmation' uidb64=uid token=token %}">Activate my account</a>
+

@@ -1,15 +1,55 @@
 {% extends "base.html" %}
-{% load staticfiles %}
 
+{% block extra_head %}
+<script>
+$(document).ready(function(){
+  $("label").addClass("control-label");
+  $("label").addClass("col-sm-1");
+});
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="module">
-  <form id="message" method="post">
-    {% csrf_token %}
-    <h1>Compose your message Bro</h1>
-      {{ form.as_table }}
-    <div class="clear"></div>
-    <button type="submit" class="btn btn-default btn-lg active">Button</button>
-  </form>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+        <h3>Compose your message</h3>
+        <hr/>
+        <form id="message" role="form" method="post" class="form-horizontal">
+          {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="form-group">
+              {{form.subject.errors}}
+              {{form.subject.label_tag}}
+              <div class="col-sm-7">
+                {{form.subject}}
+              </div>
+            </div>
+            <div class="form-group">
+              {{form.message.errors}}
+              {{form.message.label_tag}}
+              <div class="col-sm-7">
+                {{form.message}}
+              </div>
+            </div>
+            <div class="form-group">
+                {{form.email.errors}}
+                {{form.email.label_tag}}
+              <div class="col-sm-7">
+                {{form.email}}
+              </div>
+            </div>
+            {{ form.person_id }}
+            {{ form.person_name }}
+            <button type="submit" class="btn btn-default btn-lg active">Button</button>
+          </form>
+          <div class="clear"></div>
+        </form>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+  </div>
 </div>
 {% endblock %}
