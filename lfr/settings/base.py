@@ -88,8 +88,34 @@ LOGIN_REDIRECT_URL = '/'
 VERIFY_EMAIL_URL = '/verify_email_pending/'
 SET_PASSWORD_URL = '/set_password/'
 
-# Custom auth mode.
+# Custom auth model since we're using email as username.
 AUTH_USER_MODEL = 'app.LfrUser'
 
-LFR_DOMAIN = 'localhost:8000'
-LFR_EMAIL_SENDER = 'thom@example.com'
+# -----------------------------------------------------------------------------
+# Sunlight API settings.
+SUNLIGHT_API_KEY = os.environ['SUNLIGHT_API_KEY']
+EARWIG_URL = os.environ['EARWIG_URL']
+EARWIG_KEY = os.environ['EARWIG_KEY']
+EARWIG_TTL = int(os.environ['EARWIG_TTL'])
+EARWIG_DEBUG_PERSON_ID = os.environ['EARWIG_DEBUG_PERSON_ID']
+
+# -----------------------------------------------------------------------------
+# Postmark API settings.
+POSTMARK_API_KEY = os.environ['POSTMARK_API_KEY']
+POSTMARK_INBOUND_HASH = os.environ['POSTMARK_INBOUND_HASH']
+POSTMARK_INBOUND_HOST = 'inbound.postmarkapp.com'
+
+# True if we set custom domain for the reply-to
+# messager rather than inbound.postmarkapp.com. Used in deciding
+# whether the reply-to domain is ours or theirs.
+# NOTE: an option they suggest is google apps custom forwarding.
+# http://support.postmarkapp.com/customer/portal/articles/304511-configuring-a-custom-email-address-forward-with-gmail
+POSTMARK_MX_FORWARDING_ENABLED = False
+
+# Postmark SMTP settings
+EMAIL_HOST = 'smtp.postmarkapp.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = POSTMARK_API_KEY
+EMAIL_HOST_PASSWORD = POSTMARK_API_KEY
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = os.environ['DEFAULT_FROM_EMAIL']
