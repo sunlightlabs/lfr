@@ -17,10 +17,10 @@ from django.utils.encoding import force_bytes, force_text
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
-from django.contrib.auth.models import Group, Permission
-from django.contrib.auth import get_user_model, authenticate, login
-from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.decorators import (
     user_passes_test, login_required, permission_required)
 from django.contrib.contenttypes.models import ContentType
@@ -70,7 +70,6 @@ class ComposeMessage(edit.CreateView):
         '''If the user is not logged in, create a passwordless
         account for them and consider them logged in.
         '''
-
         # Create new user if necessary.
         if not self.request.user.is_authenticated():
             email = form.data['email']
@@ -97,14 +96,8 @@ class ComposeMessage(edit.CreateView):
 
         return redirect_resp
 
-def prompt_for_password(user):
-    if hasattr(user, 'has_unusable_password'):
-        return user.has_unusable_password()
-    return True
-
 
 @login_required
-@user_passes_test(prompt_for_password, login_url=settings.SET_PASSWORD_URL)
 @permission_required('app.add_message', login_url=settings.VERIFY_EMAIL_URL)
 def confirm_message_sent(request, message_id):
     '''This ensures the user is authenticated, has been prompted for a
@@ -187,9 +180,22 @@ def email_verification_confirmation(request, uidb64=None, token=None,
 
 
 def email_verification_complete(request):
+    if not request.user.is_authenticated:
+        return render(request, 'app/verify_email_complete.html', {})
+
+    # Flash a confirmation message.
     messages.success(request, 'Your account was successfully activated.')
-    if request.user.is_authenticated:
-        message_id = request.session.pop('message_id')
-        return redirect(
-            urlresolvers.reverse('confirm_message_sent', args=(message_id,)))
-    return render(request, 'app/verify_email_complete.html', {})
+
+    # If no password set yet, suggest setting password.
+    if request.user.has_unusable_password():
+        tmpl = '''
+            To make logging in easier next time, please
+            <a href="{% url 'django.contrib.auth.views.password_reset' %}">
+            set your password.</a>
+            '''
+        messages.warning(request, loader.render_to_string(tmpl))
+
+    # Forward to the pending message.
+    message_id = request.session.pop('message_id')
+    return redirect(
+        urlresolvers.reverse('confirm_message_sent', args=(message_id,)))

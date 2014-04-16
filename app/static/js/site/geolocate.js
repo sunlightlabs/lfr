@@ -41,7 +41,7 @@ $(document).ready(function() {
 
   function inject_latlng() {
     var form, input;
-    form = $("#searchAddressform");
+    form = $("form#geo_lookup");
 
     input = $("<input></input>");
     input.attr("value", window.lat);

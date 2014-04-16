@@ -91,7 +91,5 @@ SET_PASSWORD_URL = '/set_password/'
 # Custom auth mode.
 AUTH_USER_MODEL = 'app.LfrUser'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
 LFR_DOMAIN = 'localhost:8000'
 LFR_EMAIL_SENDER = 'thom@example.com'

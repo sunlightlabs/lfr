@@ -4,9 +4,10 @@
 {% block extra_head %}
 <script>
 $(document).ready(function(){
-  $("#username").css("placeholder", "Email address");
-  $("#password").css("placeholder", "Password");
-  $("label").hide();
+  $("#id_username").attr("placeholder", "Email address");
+  $("#id_password").attr("placeholder", "Password");
+  $("label").addClass("sr-only");
+  $("input").addClass("form-control");
 
   // Apply Boostrap classes to error list.
   var errors, error_wrap;
