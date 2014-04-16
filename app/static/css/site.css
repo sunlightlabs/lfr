@@ -22,6 +22,12 @@
   background:#6699cc;
 }
 
+/* Sticky nav bar styles
+-------------------------------------------------- */
+body {
+  /*min-height: 600px;*/
+  padding-top: 70px;
+}
 
 /* Sticky footer styles
 -------------------------------------------------- */
