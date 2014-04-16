@@ -15,7 +15,7 @@ $(document).ready(function(){
     <div class="row">
       <div class="col-md-2"></div>
       <div class="col-md-8">
-        <h2>Compose your message</h2>
+        <h2>Compose your message to {{request.GET.person_name}}</h2>
         <hr/>
         <form id="message" role="form" method="post" class="form-horizontal">
           {% csrf_token %}

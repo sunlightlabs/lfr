@@ -1,0 +1,52 @@
+  <!--nav bar -->
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">LFR</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        {% if request.user.is_authenticated %}
+          {% comment %}
+            Logged-in users get a dropdown with options to
+            log out, change, password, etc.
+          {% endcomment %}
+          <li class="dropdown">
+
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{request.user.email|default:request.user}} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+
+              {# Set/change password. #}
+              {% if request.user.has_unusable_password %}
+                <li><a href="{% url 'django.contrib.auth.views.password_change' %}">Set Password</a></li>
+              {% else %}
+                <li><a href="{% url 'django.contrib.auth.views.password_change' %}">Change Password</a></li>
+              {% endif %}
+
+              {# Log out. #}
+              <li class="divider"></li>
+              <li><a href="{% url 'django.contrib.auth.views.logout' %}">Log Out</a></li>
+            </ul>
+          </li>
+
+        {% else %}
+          {% comment %}
+            Anonymous users get the option to log in.
+          {% endcomment %}
+          <li>
+            <a href="{% url 'django.contrib.auth.views.login' %}?next={{request.get_full_path}}">Log in</a>
+          </li>
+        {% endif %}
+      </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>

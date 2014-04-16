@@ -14,28 +14,29 @@ $(document).ready(function(){
     <div class="row">
       <div class="col-md-2"></div>
       <div class="col-md-8">
-      <h2>Your message was sent</h2>
-      <hr/>
-        <div class="row">
-          <div class="col-sm-1">From</div>
-          <div class="col-sm-8">{{message.user.email}}</div>
-        </div>
-        <div class="row">
-          <div class="col-sm-1">To</div>
-          <div class="col-sm-8">{{message.person_name}}</div>
-        </div>
-        <div class="row">
-          <div class="col-sm-1">Subject</div>
-          <div class="col-sm-8">{{message.subject}}</div>
-        </div>
-        <div class="row">
-          <div class="col-sm-1">Message</div>
-          <div class="col-sm-8">{{message.message}}</div>
-        </div>
-        {{message.message}}
+        <h2>Your message was sent to {{message.person_name}}</h2>
       </div>
       <div class="col-md-2"></div>
     </div>
+    <div class="row">
+      <div class="col-md-1"></div>
+      <div class="col-md-1">
+        <h4 class="text-muted">Subject:</h4>
+      </div>
+      <div class="col-md-8">
+        <h4>{{message.subject}}</h4>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-1"></div>
+      <div class="col-md-1">
+        <h4 class="text-muted">Message:</h4>
+      </div>
+      <div class="well col-md-8">
+        {{message.message}}
+      </div>
+    </div>
+    <div class="col-md-2"></div>
   </div>
 </div>
 {% endblock %}

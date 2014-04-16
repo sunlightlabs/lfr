@@ -7,8 +7,8 @@ from app.models import Message
 class GeoLookupForm(forms.Form):
     lat = forms.CharField(widget=widgets.HiddenInput(attrs={}))
     lng = forms.CharField(widget=widgets.HiddenInput(attrs={}))
-    address = forms.CharField(widget=widgets.TextInput(attrs={
-        'placeholder': 'e.g. 1818 N Street NW Washington, DC 20036',
+    address = forms.CharField(required=False, widget=widgets.TextInput(attrs={
+        'placeholder': 'Leave blank to use your current location',
         'class': "form-control input-lg transparent search",
         'size': '50'}))
 

@@ -1,21 +1,48 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<script>
+  $(document).ready(function() {
+    $('tr').css('cursor', 'pointer');
+    $('tr').click(function(){
+      var a = $(this).find('a')[0];
+      window.location = $(a).attr("href");
+    });
+  });
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="module">
-  <h2>Choose a person to contact:</h2>
-  <div>
-    <table class="table">
-      <tr>
-        <th>Person</th>
-        <th></th>
-      </tr>
-    {% for person in people %}
-      <tr>
-        <td>{{person.name}}</td>
-        <td><a href="{% url 'compose_message' %}?person_id={{person.id}}&person_name={{person.name}}" class="btn btn-xs">Contact</a></td>
-      </tr>
-    {% endfor %}
-    </table>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+        {% if not people %}
+          <h2>No people found.</h2>
+          <p>Try again <a href="{% url 'geo_lookup' %}">here</a>.</p>
+        {% else %}
+          <h2>Choose a person to contact:</h2>
+          <table class="table table-striped table-hover table-bordered">
+            <thead>
+              <tr>
+                <th>Person</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for person in people %}
+                <tr>
+                  <td>{{person.name}}</td>
+                  <td><a href="{% url 'compose_message' %}?person_id={{person.id}}&person_name={{person.name}}" class="btn btn-primary btn-xs pull-right" role="button">Send message</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+      </div>
+      <div class="col-md-2"></div>
+    </div>
   </div>
 </div>
 {% endblock %}

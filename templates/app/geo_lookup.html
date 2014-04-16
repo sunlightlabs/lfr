@@ -16,18 +16,30 @@
 {% block content %}
 <div class="module">
   <div class="container">
-    <h2>Enter your address:</h2>
-    <form class="form-inline" method="post" id="geo_lookup">
-      {% csrf_token %}
-      {{form}}
-      <button type="submit" class="btn btn-lg">
-        <span>Search</span>
-      </button>
-    </form>
-    <hr/>
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+        <h2>Search for your address:</h2>
+        <form class="form-inline" method="post" id="geo_lookup">
+          {% csrf_token %}
+          {{form}}
+          <button type="submit" class="btn btn-lg">
+            <span>Search</span>
+          </button>
+        </form>
+        <hr/>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+        <div class="popin">
+          <div id="map"></div>
+        </div>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
   </div>
-</div>
-<div class="popin">
-  <div id="map"></div>
 </div>
 {% endblock %}
