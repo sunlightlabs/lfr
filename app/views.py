@@ -5,8 +5,11 @@ import requests
 
 from django.conf import settings
 from django.core import urlresolvers, mail
+from django.core.exceptions import PermissionDenied
 
 from django.views.generic import edit
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -49,6 +52,29 @@ class GeoLookup(edit.FormView):
         people = resp.json()['results']
         ctx = dict(people=people)
         return render(self.request, 'app/results.html', ctx)
+
+
+class UserMessageList(ListView):
+    """Message list view.
+    """
+    model = Message
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        messages = ctx['object_list']
+        messages = messages.filter(email=self.request.user.email)
+        ctx['object_list'] = messages
+        return ctx
+
+
+class MessageDetail(DetailView):
+    model = Message
+
+    def get_context_data(self, **kwargs):
+        if kwargs['object'].email != self.request.user.email:
+            msg = 'You can only view your own messages.'
+            raise PermissionDenied(msg)
+        return super().get_context_data(**kwargs)
 
 
 class ComposeMessage(edit.CreateView):
@@ -210,9 +236,12 @@ def email_verification_complete(request):
             request, loader.render_to_string('app/_please_set_password.html'))
 
     # Forward to the pending message.
-    message_id = request.session.pop('message_id')
-    return redirect(
-        urlresolvers.reverse('confirm_message_sent', args=(message_id,)))
+    message_id = request.session.pop('message_id', None)
+    if message_id is not None:
+        return redirect(
+            urlresolvers.reverse('confirm_message_sent', args=(message_id,)))
+    else:
+        return render(request, 'app/verify_email_complete.html', {})
 
 
 @sensitive_post_parameters()

@@ -8,7 +8,7 @@ class GeoLookupForm(forms.Form):
     lat = forms.CharField(widget=widgets.HiddenInput(attrs={}))
     lng = forms.CharField(widget=widgets.HiddenInput(attrs={}))
     address = forms.CharField(required=False, widget=widgets.TextInput(attrs={
-        'placeholder': 'Leave blank to use your current location',
+        'placeholder': 'Your address, or leave blank to use your current location',
         'class': "form-control input-lg transparent search",
         'size': '50'}))
 

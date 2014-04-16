@@ -5,6 +5,14 @@
 $(document).ready(function(){
   $("label").addClass("control-label");
   $("label").addClass("col-sm-1");
+  $("input").addClass("form-control");
+
+  // Apply Boostrap classes to error list.
+  var errors, error_wrap;
+  errors = $(".errorlist")
+  error_wrap = $('<p class="text-danger"></p>');
+  error_wrap.append(errors.clone());
+  errors.replaceWith(error_wrap);
 });
 </script>
 {% endblock %}
