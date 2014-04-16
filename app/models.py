@@ -1,3 +1,4 @@
+import json
 import logging
 import requests
 from urllib.parse import urljoin
@@ -18,39 +19,52 @@ class EarwigMessageError(Exception):
 
 
 class Message(models.Model):
-    '''Used by the model form.
+    '''Represents a submitted message.
     '''
     subject = models.CharField(max_length=255)
     person_id = models.CharField(max_length=255)
     person_name = models.CharField(max_length=255)
     message = models.TextField()
     email = models.EmailField()
+    created = models.DateTimeField(default=timezone.now)
 
     @property
     def user(self):
         return get_user_model().objects.get(email=self.email)
 
+    def __str__(self):
+        tmpl = 'from %r to %r'
+        return tmpl % (self.email, self.person_name)
+
     def send_to_earwig(sender, instance, **kwargs):
         '''Send this message to earwig, then delete the local
         copy.
         '''
+        # If in debug mode, send messages to self.
+        if settings.DEBUG:
+            person_id = settings.EARWIG_DEBUG_PERSON_ID
+        else:
+            person_id = instance.person_id
         user = instance.user
         data = dict(
             type='email',
             subject=instance.subject,
             message=instance.message,
-            sender=dict(email=instance.email),
-            recipients=instance.person_id,
-            user_email_verified=user.is_verified)
-        url = urljoin(settings.EARWIG_URL, 'messages')
+            sender=json.dumps(dict(
+                email=instance.email,
+                name=instance.person_name,
+                ttl=settings.EARWIG_TTL)),
+            recipients=person_id,
+            user_email_verified=user.is_verified,
+            key=settings.EARWIG_KEY)
+        url = urljoin(settings.EARWIG_URL, 'message/')
         if settings.DEBUG:
             msg = 'Sending earwig message: %r'
             logging.getLogger().warning(msg % data)
-        else:
-            resp = requests.post(url, data=data)
-            if not resp.status_code == 200:
-                msg = 'Got status %d from earwig' % resp.status_code
-                raise EarwigMessageError(msg)
+        resp = requests.post(url, data=data)
+        if not resp.status_code == 200:
+            msg = 'Got status %d from earwig' % resp.status_code
+            raise EarwigMessageError(msg)
 
 
 post_save.connect(Message.send_to_earwig, sender=Message)
