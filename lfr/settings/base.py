@@ -97,6 +97,9 @@ SUNLIGHT_API_KEY = os.environ['SUNLIGHT_API_KEY']
 EARWIG_URL = os.environ['EARWIG_URL']
 EARWIG_KEY = os.environ['EARWIG_KEY']
 EARWIG_TTL = int(os.environ['EARWIG_TTL'])
+
+# In debug or dryrun mode, emails get sent to EARWIG_DEBUG_PERSON_ID
+EARWIG_DRYRUN = True
 EARWIG_DEBUG_PERSON_ID = os.environ['EARWIG_DEBUG_PERSON_ID']
 
 # -----------------------------------------------------------------------------
