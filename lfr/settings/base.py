@@ -106,14 +106,6 @@ EARWIG_DEBUG_PERSON_ID = os.environ['EARWIG_DEBUG_PERSON_ID']
 # Postmark API settings.
 POSTMARK_API_KEY = os.environ['POSTMARK_API_KEY']
 POSTMARK_INBOUND_HASH = os.environ['POSTMARK_INBOUND_HASH']
-POSTMARK_INBOUND_HOST = 'inbound.postmarkapp.com'
-
-# True if we set custom domain for the reply-to
-# messager rather than inbound.postmarkapp.com. Used in deciding
-# whether the reply-to domain is ours or theirs.
-# NOTE: an option they suggest is google apps custom forwarding.
-# http://support.postmarkapp.com/customer/portal/articles/304511-configuring-a-custom-email-address-forward-with-gmail
-POSTMARK_MX_FORWARDING_ENABLED = False
 
 # Postmark SMTP settings
 EMAIL_HOST = 'smtp.postmarkapp.com'
