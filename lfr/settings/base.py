@@ -105,7 +105,6 @@ EARWIG_DEBUG_PERSON_ID = os.environ['EARWIG_DEBUG_PERSON_ID']
 # -----------------------------------------------------------------------------
 # Postmark API settings.
 POSTMARK_API_KEY = os.environ['POSTMARK_API_KEY']
-POSTMARK_INBOUND_HASH = os.environ['POSTMARK_INBOUND_HASH']
 
 # Postmark SMTP settings
 EMAIL_HOST = 'smtp.postmarkapp.com'
