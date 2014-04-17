@@ -41,7 +41,7 @@ class Message(models.Model):
         copy.
         '''
         # If in debug mode, send messages to self.
-        if settings.DEBUG:
+        if settings.DEBUG or setteings.EARWIG_DRYRUN:
             person_id = settings.EARWIG_DEBUG_PERSON_ID
         else:
             person_id = instance.person_id
@@ -57,14 +57,18 @@ class Message(models.Model):
             recipients=person_id,
             user_email_verified=user.is_verified,
             key=settings.EARWIG_KEY)
+
         url = urljoin(settings.EARWIG_URL, 'message/')
-        if settings.DEBUG:
+
+        # Send to earwig only if EARWIG_DRYRUN is false.
+        if settings.EARWIG_DRYRUN:
             msg = 'Sending earwig message: %r'
             logging.getLogger().warning(msg % data)
-        resp = requests.post(url, data=data)
-        if not resp.status_code == 200:
-            msg = 'Got status %d from earwig' % resp.status_code
-            raise EarwigMessageError(msg)
+        else:
+            resp = requests.post(url, data=data)
+            if not resp.status_code == 200:
+                msg = 'Got status %d from earwig' % resp.status_code
+                raise EarwigMessageError(msg)
 
 
 post_save.connect(Message.send_to_earwig, sender=Message)
