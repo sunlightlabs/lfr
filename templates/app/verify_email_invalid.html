@@ -3,7 +3,15 @@
 
 {% block content %}
 <div class="module">
-  <h3>Failure!</h3>
-  <p>You clicked an invalid link. <a href="{% url 'geo_lookup' %}">Try again</a>.</p>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+          <h2>Failure!</h2>
+          <p>You clicked an invalid link. <a href="{% url 'geo_lookup' %}">Try again</a>.</p>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+  </div>
 </div>
 {% endblock %}
